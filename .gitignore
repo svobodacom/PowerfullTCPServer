@@ -1,0 +1,24 @@
+# This file is used to ignore files which are generated
+# ----------------------------------------------------------------------------
+
+*.a
+*.o
+*.obj
+*.ui
+build/
+
+# qtcreator generated files
+*.pro
+*.pro.user*
+CMakeLists.txt.user*
+
+
+# MinGW generated files
+*.Debug
+*.Release
+
+# Binaries
+# --------
+*.dll
+*.exe
+
