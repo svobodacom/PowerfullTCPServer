@@ -13,8 +13,6 @@ public:
 
     virtual void setSocket(QTcpSocket *socket);
 
-    void readyRead();
-
 protected:
     QTcpSocket *m_socket;
     QTcpSocket *getSocket();
@@ -24,6 +22,7 @@ signals:
 public slots:
     virtual void connected();
     virtual void disconnected();
+    virtual void readyRead();
     virtual void bytesWritten(qint64 bytes);
     virtual void stateChanged(QAbstractSocket::SocketState socketState);
     virtual void error(QAbstractSocket::SocketError socketError);
