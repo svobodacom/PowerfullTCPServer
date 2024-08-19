@@ -17,12 +17,22 @@ Dialog::~Dialog()
 
 void Dialog::on_btnStart_clicked()
 {
-    setStarted(true);
+    if(m_server.listen(QHostAddress::Any, ui->spinBox->value()) )
+    {
+        qDebug() << this << "server started!";
+        setStarted(true);
+    }
+    else
+    {   qCritical() << m_server.errorString();
+        setStarted(false);
+    }
 }
+
 
 
 void Dialog::on_btnStop_clicked()
 {
+    m_server.close();
     setStarted(false);
 }
 
