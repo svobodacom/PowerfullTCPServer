@@ -100,6 +100,11 @@ void TcpConnections::accept(qintptr handle, TcpConnection *connection)
     connect(socket, &QTcpSocket::disconnected,this,&TcpConnections::disconnected);
     connect(socket, &QTcpSocket::errorOccurred,this,&TcpConnections::error);
 
+    connection->moveToThread(QThread::currentThread());
+    connection->setSocket(socket);
+
+    m_connections.insert(socket,connection);
+
     qDebug() << this << "clients = " << m_connections.count();
     emit socket->connected();
 }

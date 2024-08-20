@@ -13,6 +13,8 @@ TcpConnection::~TcpConnection()
 
 void TcpConnection::setSocket(QTcpSocket *socket)
 {
+    m_socket = socket;
+
     connect(m_socket, &QTcpSocket::connected,this,&TcpConnection::connected);
     connect(m_socket, &QTcpSocket::disconnected,this,&TcpConnection::disconnected);
     connect(m_socket, &QTcpSocket::readyRead,this,&TcpConnection::readyRead);
