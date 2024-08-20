@@ -45,6 +45,10 @@ void TcpConnection::readyRead()
 {
     if (!sender()) return;
     qDebug() << this << " readyRead " << getSocket();
+
+    QTcpSocket* socket = getSocket();
+    if (!socket) return;
+    socket->close();
 }
 
 void TcpConnection::bytesWritten(qint64 bytes)
