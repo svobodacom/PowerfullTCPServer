@@ -6,6 +6,7 @@
 #include <QFileInfo>
 #include <QUrl>
 #include <QMap>
+#include <QStringList>
 #include <QCoreApplication>
 #include "tcpconnection.h"
 
