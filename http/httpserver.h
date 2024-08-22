@@ -2,6 +2,7 @@
 #define HTTPSERVER_H
 
 #include <QObject>
+#include <QCoreApplication>
 #include <QDebug>
 #include "tcpserver.h"
 #include "httpconnection.h"
