@@ -128,6 +128,56 @@ void HttpConnection::processGet(QByteArray data)
 void HttpConnection::handleRequest()
 {
     qDebug() << this << "Handle the Request";
+
+    QString file = m_request.value("http_path","");
+
+    // strip out any directory jumps
+    file = file.replace("..","");
+
+    // /mydir/something/something + /test.jpg
+    QString actualFile = m_root + file;
+    QFileInfo fi(actualFile);
+    QByteArray response;
+
+    // if it is a directory, check for index.html
+    if (fi.isDir())
+    {
+        qDebug() << this << "client is requesting a directory...";
+        QString indexFile = actualFile + "index.html";
+        QFileInfo fIndex(indexFile);
+
+        if (fIndex.exists())
+        {
+            qDebug() << this << "setting / to /index.html";
+            fi.setFile(indexFile);
+        }
+    }
+
+    // send the file if it exists
+    if (fi.exists() && fi.isFile())
+    {
+        // YES it exists
+        QString mime = getMimeType(fi.fileName());
+        qDebug() << this << "Sending file:" << fi.path();
+        m_response.insert("code", "200");
+        m_response.insert("path", fi.filePath());
+
+        response.append("HTTP/1.1 200 OK\r\n");
+        response.append(("Content-Type: " + mime + "\r\n").toLatin1());
+        response.append(("Content-Length: " + QString::number(fi.size()) + "\r\n").toLatin1());
+        response.append("Connection: close\r\n");
+        response.append("\r\n");
+
+    }
+    else
+    {
+        // NO it does not exist
+        response.append("HTTP/1.1 404 NOT FOUND\r\n");
+        response.append("Connection: close\r\n");
+        response.append("\r\n");
+    }
+
+    m_socket->write(response);
 }
 
 
