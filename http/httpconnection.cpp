@@ -184,66 +184,108 @@ void HttpConnection::handleRequest()
 
 void HttpConnection::sendFile(QString file)
 {
-
+    // TO DO - make a rate controller!
 }
 
 
 
 QString HttpConnection::getMimeType(QString path)
 {
+    int pos = path.indexOf(".");
+    if(pos <=0) return "application/octet-stream";
 
+    QString ext = path.mid(pos + 1).toLower();
+    if (m_mime.contains(ext))
+    {
+        return m_mime.value(ext);
+    }
+
+     return "application/octet-stream";
 }
 
 
 
 void HttpConnection::connected()
 {
-
+    qDebug() << this << "connected" << getSocket();
 }
 
 void HttpConnection::disconnected()
 {
-
+ qDebug() << this << "disconnected" << getSocket();
 }
 
 void HttpConnection::readyRead()
 {
-
+    if (!m_socket) return;
+    qDebug() << this << "ReadyRead" << m_socket;
+    QByteArray data = m_socket->readAll();
+    processGet(data);
 }
 
 
 
 void HttpConnection::bytesWritten(qint64 bytes)
 {
+    if (!m_socket) return;
+    QString code = m_response.value("code","");
 
+    if (code == "200")
+    {
+        QString file = m_response.value("path,""");
+        sendFile(file);
+        // close the socket when done!
+    }
+
+    if (code == "404")
+    {
+        m_socket->close();
+        return;
+    }
 }
+
+
 
 void HttpConnection::stateChanged(QAbstractSocket::SocketState socketState)
 {
-
+    qDebug() << this << "stateChanged" << m_socket << socketState;
 }
+
+
 
 void HttpConnection::error(QAbstractSocket::SocketError socketError)
 {
-
+    qDebug() << this << "error" << m_socket << socketError;
 }
+
+
 
 void HttpConnection::started()
 {
-
+    qDebug() << this << "File transfer started!";
 }
+
+
 
 void HttpConnection::transfered(int bytes)
 {
-
+    qDebug() << this << "File transfered" << bytes;
 }
+
+
 
 void HttpConnection::finished()
 {
-
+    qDebug() << this << "File transfer finished";
+    m_file->close();
+    m_socket->close();
 }
+
+
 
 void HttpConnection::transferError()
 {
-
+    qDebug() << this << "File transfer error: "; // m_transfer->errorString();
 }
+
+

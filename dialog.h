@@ -2,7 +2,8 @@
 #define DIALOG_H
 
 #include <QDialog>
-#include "tcpserver.h"
+//#include "tcpserver.h"
+#include "httpserver.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -24,7 +25,8 @@ private slots:
 
 private:
     Ui::Dialog *ui;
-    TcpServer m_server;
+    //TcpServer m_server;
+    HttpServer m_server;
     void setStarted(bool started);
 };
 #endif // DIALOG_H
