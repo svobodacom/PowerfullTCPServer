@@ -17,6 +17,9 @@ public:
     int rate();
     void setRate(int value);
 
+    int size();
+    void setSize(int size);
+
     qint64 maximum();
     void setMaximum(qint64 value);
 
