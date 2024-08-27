@@ -35,10 +35,10 @@ int RateTransfer::size()
 
 
 
-void RateTransfer::setSize(int size)
+void RateTransfer::setSize(int value)
 {
-    m_size = size;
-    qDebug() << this << "Size set to " << size;
+    m_size = value;
+    qDebug() << this << "Size set to " << value;
 }
 
 
@@ -193,7 +193,43 @@ bool RateTransfer::checkTransfer()
 
 void RateTransfer::scheduleTransfer()
 {
+    qDebug() << this << "sheduleTransfer called";
 
+    if(m_scheduled)
+    {
+        qWarning() << this << "Exiting scheduleTransfer due to: waiting on timer";
+        return;
+    }
+
+    if (!m_transfering)
+    {
+        qWarning() << this << "Exiting scheduleTransfer due to: not transfering";
+        return;
+    }
+
+    if (m_source->bytesAvailable() <= 0)
+    {
+        qWarning() << this << "Exiting scheduleTransfer due to: no bytes available to be read";
+        return;
+    }
+
+    int prediction = m_transfered + m_size;
+    if (prediction <= m_rate)
+    {
+        qDebug() << this << "calling transfer from scheduleTransfer";
+        transfer();
+    }
+    else
+    {
+        int current = QTime::currentTime().msec();
+        int delay = 1000 - current;
+        qDebug() << this << "Rate limit (" << m_rate << ") exeeded in prediction (" << m_transfered << " to " << prediction << "), "
+                            "delaying transfer for "  << delay << "ms";
+
+        m_transfered = 0;
+        m_scheduled = true;
+        m_timer.singleShot(delay,this,&RateTransfer::transfer);
+    }
 }
 
 
@@ -209,11 +245,13 @@ void RateTransfer::start()
     }
 
     m_error = "";
+    if (!checkDevices()) return;
+
     m_transfering = true;
     m_transfered = 0;
     emit started();
 
-    if (!m_source->isSequential() && m_source->bytesAvailable() >0)
+    if (!m_source->isSequential() && m_source->bytesAvailable() > 0)
     {
         qDebug() << this << "Starting transfer by calling scheduleTransfer";
         scheduleTransfer();
@@ -235,6 +273,8 @@ void RateTransfer::stop()
 void RateTransfer::transfer()
 {
 
+
+
 }
 
 
@@ -249,6 +289,7 @@ void RateTransfer::readyRead()
 
 void RateTransfer::bytesWritten(qint64 bytes)
 {
+    Q_UNUSED(bytes)
     qDebug() << this << "bytesWritten() signaled";
     scheduleTransfer();
 }
