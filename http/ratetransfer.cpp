@@ -112,7 +112,7 @@ void RateTransfer::setDefaults()
 {
     qDebug() << this << "Setting the defaults";
     m_rate = 0;
-    m_size = 0;
+    m_size = 1024;
     m_maximum = 0;
     m_transfering = false;
     m_transfered = 0;
@@ -272,9 +272,41 @@ void RateTransfer::stop()
 
 void RateTransfer::transfer()
 {
+    m_scheduled = false;
+    qDebug() << this << "transfering at a maximum of " << m_rate << "bytes per second";
+    m_error = "";
 
+    if (!checkDevices()) return;
+    if (!checkTransfer()) return;
 
+    qDebug() << this << "reading from source";
+    QByteArray buffer;
+    buffer = m_source->read(m_size);
 
+    qDebug() << this << "writing to destination: " << buffer.length();
+    m_destination->write(buffer);
+    m_transfered += buffer.length();
+
+    if (m_maximum > 0 && m_transfered >= m_maximum)
+    {
+        qDebug() << this << "Stopping due to maximum limit reached";
+        emit finished();
+        stop();
+    }
+
+    if (!m_source->isSequential() && m_source->bytesAvailable() == 0)
+    {
+        qDebug() << this << "Stopping due to end of file";
+        emit finished();
+        stop();
+    }
+
+    if (m_transfering == false) return;
+    if (!m_source->isSequential() && m_source->bytesAvailable() > 0)
+    {
+        qDebug() << this << "Source still has bytes, sheduling a transfer";
+        scheduleTransfer();
+    }
 }
 
 
