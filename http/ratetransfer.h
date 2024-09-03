@@ -51,7 +51,7 @@ protected:
 
 signals:
     void started();
-    void transfered(int bytes);
+    void transfered(qint64 bytes);
     void finished();
     void error();
 

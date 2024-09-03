@@ -6,8 +6,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    Test cTest;
-    cTest.doTest();
+    //Test cTest;
+    //cTest.doTest();
 
     Dialog w;
     w.show();

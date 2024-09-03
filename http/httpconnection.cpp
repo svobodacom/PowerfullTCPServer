@@ -184,7 +184,32 @@ void HttpConnection::handleRequest()
 
 void HttpConnection::sendFile(QString file)
 {
-    // TO DO - make a rate controller!
+    if (!m_socket) return;
+    m_file = new QFile(file,this);
+    m_transfer = new RateTransfer(this);
+
+    qDebug() << this << "Created: " << m_transfer;
+
+    connect(m_transfer, &RateTransfer::started, this, &HttpConnection::started);
+    connect(m_transfer, &RateTransfer::finished, this, &HttpConnection::finished);
+    connect(m_transfer, &RateTransfer::error, this, &HttpConnection::transferError);
+    connect(m_transfer, &RateTransfer::transfered, this, &HttpConnection::transfered);
+
+    if (!m_file->open(QFile::ReadOnly))
+    {
+        qWarning() << "Could not open file: " << file;
+        m_socket->close();
+    }
+
+    m_transfer->setSource(m_file);
+    m_transfer->setDestination(m_socket);
+    m_transfer->setRate(m_rate);
+    m_transfer->setSize(1024);
+
+    qDebug() << "Starting file transfer...";
+    m_response.remove("code");
+
+    m_transfer->start();
 }
 
 
@@ -232,9 +257,8 @@ void HttpConnection::bytesWritten(qint64 bytes)
 
     if (code == "200")
     {
-        QString file = m_response.value("path,""");
+        QString file = m_response.value("path","");
         sendFile(file);
-        // close the socket when done!
     }
 
     if (code == "404")
@@ -267,7 +291,7 @@ void HttpConnection::started()
 
 
 
-void HttpConnection::transfered(int bytes)
+void HttpConnection::transfered(qint64 bytes)
 {
     qDebug() << this << "File transfered" << bytes;
 }
@@ -285,7 +309,9 @@ void HttpConnection::finished()
 
 void HttpConnection::transferError()
 {
-    qDebug() << this << "File transfer error: "; // m_transfer->errorString();
+    qDebug() << this << "File transfer error: " << m_transfer->errorString();
+    m_file->close();
+    m_socket->close();
 }
 
 

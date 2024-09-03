@@ -6,7 +6,7 @@ Test::Test(QObject *parent) : QObject{parent} { }
 void Test::doTest()
 {
     m_source.setFileName("C:/QT_LESSONS/HightPerfomanceTCPServer/Test/DTEK.png");
-    m_destination.setFileName("C:/QT_LESSONS/HightPerfomanceTCPServer/Test/NEW1.png");
+    m_destination.setFileName("C:/QT_LESSONS/HightPerfomanceTCPServer/Test/NEW_DTEK.png");
     m_transfer.setSource(&m_source);
     m_transfer.setDestination(&m_destination);
     m_transfer.setRate(4000);

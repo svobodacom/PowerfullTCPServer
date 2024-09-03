@@ -20,6 +20,8 @@ void Dialog::on_btnStart_clicked()
     if(m_server.listen(QHostAddress::Any, ui->spinBox->value()) )
     {
         qDebug() << this << "server started!";
+        m_server.setRate(4096);
+        m_server.setRoot("C:/QT_LESSONS/HightPerfomanceTCPServer/Test");
         setStarted(true);
     }
     else

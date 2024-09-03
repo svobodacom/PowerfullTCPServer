@@ -286,6 +286,7 @@ void RateTransfer::transfer()
     qDebug() << this << "writing to destination: " << buffer.length();
     m_destination->write(buffer);
     m_transfered += buffer.length();
+    emit transfered(m_transfered);
 
     if (m_maximum > 0 && m_transfered >= m_maximum)
     {

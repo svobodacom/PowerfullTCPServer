@@ -9,7 +9,7 @@
 #include <QStringList>
 #include <QCoreApplication>
 #include "tcpconnection.h"
-
+#include "ratetransfer.h"
 
 
 class HttpConnection : public TcpConnection
@@ -31,7 +31,7 @@ protected:
     QMap<QString, QString> m_request;
     QMap<QString, QString> m_response;
     QMap<QString, QString> m_mime;
-    // To Do - make a rate controller!
+    RateTransfer *m_transfer;
 
     void processGet(QByteArray data);
     void handleRequest();
@@ -47,7 +47,7 @@ public slots:
     virtual void error(QAbstractSocket::SocketError socketError);
 
     void started();
-    void transfered(int bytes);
+    void transfered(qint64 bytes);
     void finished();
     void transferError();
 };
