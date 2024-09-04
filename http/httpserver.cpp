@@ -47,10 +47,11 @@ void HttpServer::setRate(int value)
 
 void HttpServer::incomingConnection(qintptr descriptor)
 {
-    qDebug() << this << "Incoiming HTTP connection: " << descriptor;
+    qDebug() << this << "Incoming HTTP connection: " << descriptor;
 
     HttpConnection *connection = new HttpConnection();
 
-    // TO DO = set rate and root
+    connection->setRate(m_rate);
+    connection->setRoot(m_root);
     accept(descriptor, connection);
 }

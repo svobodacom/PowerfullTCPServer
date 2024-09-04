@@ -3,7 +3,7 @@
 TcpConnection::TcpConnection(QObject *parent)
     : QObject{parent}
 {
-     qDebug() << this << "Created";
+     qDebug() << this << "Created in Constructor of TcpConnection";
 }
 
 TcpConnection::~TcpConnection()
@@ -44,11 +44,11 @@ void TcpConnection::disconnected()
 void TcpConnection::readyRead()
 {
     if (!sender()) return;
-    qDebug() << this << " readyRead " << getSocket();
+    qDebug() << this << " readyRead from TcpConnection " << getSocket();
 
-    QTcpSocket* socket = getSocket();
-    if (!socket) return;
-    socket->close();
+    //QTcpSocket* socket = getSocket();
+    //if (!socket) return;
+    //socket->close();
 }
 
 void TcpConnection::bytesWritten(qint64 bytes)

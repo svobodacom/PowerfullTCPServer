@@ -143,13 +143,17 @@ void HttpConnection::handleRequest()
     if (fi.isDir())
     {
         qDebug() << this << "client is requesting a directory...";
-        QString indexFile = actualFile + "index.html";
+        QString indexFile = actualFile + "/index.html";
         QFileInfo fIndex(indexFile);
 
         if (fIndex.exists())
         {
             qDebug() << this << "setting / to /index.html";
             fi.setFile(indexFile);
+        }
+        else
+        {
+            qWarning() << this << "IndexFile is missing: " << indexFile;
         }
     }
 
@@ -177,6 +181,7 @@ void HttpConnection::handleRequest()
         response.append("\r\n");
     }
 
+    qDebug() << this << "Writing header to socket";
     m_socket->write(response);
 }
 
@@ -184,7 +189,9 @@ void HttpConnection::handleRequest()
 
 void HttpConnection::sendFile(QString file)
 {
-    if (!m_socket) return;
+   if (!m_socket) return;
+
+    qDebug() << this << "Sending file: " << file;
     m_file = new QFile(file,this);
     m_transfer = new RateTransfer(this);
 
@@ -253,11 +260,18 @@ void HttpConnection::readyRead()
 void HttpConnection::bytesWritten(qint64 bytes)
 {
     if (!m_socket) return;
+
     QString code = m_response.value("code","");
+
+    if (!code.isEmpty())
+    {
+        qDebug() << this << "code =  " << code;
+    }
 
     if (code == "200")
     {
         QString file = m_response.value("path","");
+        qDebug() << this << "Attempting to send file: " << file;
         sendFile(file);
     }
 

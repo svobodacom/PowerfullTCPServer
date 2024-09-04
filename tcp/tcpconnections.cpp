@@ -26,6 +26,7 @@ void TcpConnections::removeSocket(QTcpSocket *socket)
 {
     if (!socket) return;
     if (!m_connections.contains(socket)) return;
+
     qDebug() << this << "removing socket = " << socket;
 
     if (socket->isOpen())
